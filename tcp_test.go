@@ -1,4 +1,4 @@
-package tcpgo
+package main
 
 import (
 	"bytes"

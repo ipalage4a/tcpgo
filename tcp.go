@@ -1,4 +1,4 @@
-package tcpgo
+package main
 
 import (
 	"bufio"
@@ -16,10 +16,23 @@ type Server struct {
 	Port int
 }
 
-func NewServer() *Server {
+func WithPort(port int) func(s *Server) {
+	return func(s *Server) {
+		s.Port = port
+	}
+}
+
+func NewServer(opts ...func(s *Server)) *Server {
 	s := new(Server)
+
+	// set default
 	s.Port = 1234
 	s.input = make(chan []byte, 10)
+	
+	for _, opt := range opts {
+		opt(s)
+	}
+	
 	return s
 }
 
@@ -49,7 +62,7 @@ func (s *Server) Serve() {
 			if err != nil {
 				return
 			}
-			
+
 			// remove delimeter
 			s.input <- message[:len(message)-1]
 		}(conn)
